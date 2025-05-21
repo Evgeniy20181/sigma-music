@@ -1,0 +1,15 @@
+C:\Users\Administrator\Desktop\prove_eksamen\sigma-music\sigma-music\bin\Debug\net9.0\sigma-music.exe
+C:\Users\Administrator\Desktop\prove_eksamen\sigma-music\sigma-music\bin\Debug\net9.0\sigma-music.deps.json
+C:\Users\Administrator\Desktop\prove_eksamen\sigma-music\sigma-music\bin\Debug\net9.0\sigma-music.runtimeconfig.json
+C:\Users\Administrator\Desktop\prove_eksamen\sigma-music\sigma-music\bin\Debug\net9.0\sigma-music.dll
+C:\Users\Administrator\Desktop\prove_eksamen\sigma-music\sigma-music\bin\Debug\net9.0\sigma-music.pdb
+C:\Users\Administrator\Desktop\prove_eksamen\sigma-music\sigma-music\obj\Debug\net9.0\sigma-music.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Administrator\Desktop\prove_eksamen\sigma-music\sigma-music\obj\Debug\net9.0\sigma-music.AssemblyInfoInputs.cache
+C:\Users\Administrator\Desktop\prove_eksamen\sigma-music\sigma-music\obj\Debug\net9.0\sigma-music.AssemblyInfo.cs
+C:\Users\Administrator\Desktop\prove_eksamen\sigma-music\sigma-music\obj\Debug\net9.0\sigma-music.csproj.CoreCompileInputs.cache
+C:\Users\Administrator\Desktop\prove_eksamen\sigma-music\sigma-music\obj\Debug\net9.0\sigma-music.sourcelink.json
+C:\Users\Administrator\Desktop\prove_eksamen\sigma-music\sigma-music\obj\Debug\net9.0\sigma-music.dll
+C:\Users\Administrator\Desktop\prove_eksamen\sigma-music\sigma-music\obj\Debug\net9.0\refint\sigma-music.dll
+C:\Users\Administrator\Desktop\prove_eksamen\sigma-music\sigma-music\obj\Debug\net9.0\sigma-music.pdb
+C:\Users\Administrator\Desktop\prove_eksamen\sigma-music\sigma-music\obj\Debug\net9.0\sigma-music.genruntimeconfig.cache
+C:\Users\Administrator\Desktop\prove_eksamen\sigma-music\sigma-music\obj\Debug\net9.0\ref\sigma-music.dll
