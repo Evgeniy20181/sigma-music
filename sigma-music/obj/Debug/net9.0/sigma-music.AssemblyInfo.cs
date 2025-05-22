@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("sigma-music")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5c517fe3441145278495136ab3e5c8bccf8b422f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+02efe8d686238266dad210a197a0fff039d14c08")]
 [assembly: System.Reflection.AssemblyProductAttribute("sigma-music")]
 [assembly: System.Reflection.AssemblyTitleAttribute("sigma-music")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
