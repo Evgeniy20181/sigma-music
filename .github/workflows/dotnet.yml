@@ -23,6 +23,6 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore --project ./sigma-music
+      run: dotnet build --no-restore  .\sigma-music\
     - name: Test
-      run: dotnet test --no-build --verbosity normal --project ./sigma-music
+      run: dotnet test --no-build --verbosity normal  .\sigma-music\
