@@ -17,6 +17,24 @@ public static class Db
         _command = _connection.CreateCommand();
         Console.WriteLine("Db ready!");
     }
+    
+    public static SqliteDataReader? RunSqlReader(string sql, IEnumerable<SqliteParameter> parameters)
+    {
+        if(IsGetReady() != true) return null;
+        try
+        {
+            Console.WriteLine("Executing SQL reader...");
+            _command.CommandText = sql;
+            _command.Parameters.AddRange(parameters);
+            return _command.ExecuteReader();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return null;
+        }
+    }
+    
 
     public static void RunSqlNonQuery(string sql)
     {
@@ -24,6 +42,15 @@ public static class Db
         _command.CommandText = sql;
         _command.ExecuteNonQuery();
     }
+    
+    public static int RunSqlNonQuery(string sql, IEnumerable<SqliteParameter> parameters)
+    {
+        if(IsGetReady() != true) return -2;
+        _command.CommandText = sql;
+        _command.Parameters.AddRange(parameters);
+        return _command.ExecuteNonQuery();
+    }
+    
 
     public static bool IsTableExists(string tableName)
     {
