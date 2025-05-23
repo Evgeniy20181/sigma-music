@@ -11,7 +11,7 @@ var songs = new List<SongDb>(10)
     },
     new()
     {
-        Id = 2, Name = "Billie Jean", ArtistId = 2, AlbumId = 2, Genres = "Pop",
+        Id = 2, Name = "Billie Jean", ArtistId = 2, AlbumId = 2, Genres = "Pop-disco",
         Description = "Michael Jackson hit", Tags = "pop,80s,legend"
     },
     new()
@@ -68,8 +68,12 @@ var updateSong = new SongDb()
 
 
 var musicRepo = new MusicRepo();
-//musicRepo.DebugToggle();
-//musicRepo.InsertSongs(songs);
+var playListRepo = new PlayListRepo();
+playListRepo.DebugToggle();
+musicRepo.DebugToggle();
+musicRepo.InsertSongs(songs);
+playListRepo.InsertPlayList([new PlayListDb() { Id = 10, Name = "PlayList1" }]);
+playListRepo.InsertSongToPlayList([new SongsInPlayListDb(){PlayListId = 1, SongId = 5}]);
 Thread.Sleep(startDelay);
 Console.Clear();
 
@@ -90,8 +94,15 @@ while (true)
     Console.WriteLine("2. Søk etter sanger");
     Console.WriteLine("3. Oppdater sang");
     Console.WriteLine("4. Slett sang");
-    Console.WriteLine("5. Avslutt");
-    Console.Write("Velg et alternativ (1-5): ");
+    Console.WriteLine("5. Legg til ny spilleliste");
+    Console.WriteLine("6. Søk etter spillelister");
+    Console.WriteLine("7. Oppdater spilleliste");
+    Console.WriteLine("8. Slett spilleliste");
+    Console.WriteLine("9. Legg til sang i spilleliste");
+    Console.WriteLine("10. Fjern sang fra spilleliste");
+    Console.WriteLine("11. Vis sanger i spilleliste");
+    Console.WriteLine("12. Avslutt");
+    Console.Write("Velg et alternativ (1-12): ");
     var choice = Console.ReadLine()?.Trim();
 
     switch (choice)
@@ -100,8 +111,17 @@ while (true)
         case "2": SearchSongs(musicRepo); break;
         case "3": UpdateSong(musicRepo); break;
         case "4": DeleteSong(musicRepo); break;
-        case "5":
+        case "5": CreatePlayList(playListRepo); break;
+        case "6": SearchPlayLists(playListRepo); break;
+        case "7": UpdatePlayList(playListRepo); break;
+        case "8": DeletePlayList(playListRepo); break;
+        case "9": AddSongToPlayList(playListRepo, musicRepo); break;
+        case "10": RemoveSongFromPlayList(playListRepo); break;
+        case "11": ViewSongsInPlayList(playListRepo, musicRepo); break;
+        case "12":
             Console.WriteLine("Avslutter programmet. Ha en fin dag!");
+            Db.Close();
+            Console.ReadLine();
             return;
         default: Console.WriteLine("Ugyldig valg, prøv igjen."); break;
     }
@@ -152,8 +172,8 @@ static void SearchSongs(MusicRepo repo)
     }
 
     Console.WriteLine($"Funnet {songs?.Length} sang(er):");
-    foreach (var s in songs??[])
-        Console.WriteLine(s.ToString()+"\n");
+    foreach (var s in songs ?? [])
+        Console.WriteLine(s + "\n");
 }
 
 static void UpdateSong(MusicRepo repo)
@@ -190,8 +210,194 @@ static void DeleteSong(MusicRepo repo)
     }
 
     var songDb = new SongDb { Id = id };
-    var result = repo.DeleteSongs(new[] { songDb });
+    var result = repo.DeleteSongs([songDb]);
     Console.WriteLine(result.Result ? "Ok!" : "Interne feil!");
+}
+
+static void CreatePlayList(PlayListRepo repo)
+{
+    Console.WriteLine("\n== Legg til ny spilleliste ==");
+    Console.Write("Navn på spillelisten: ");
+    var name = Console.ReadLine()?.Trim();
+    if (string.IsNullOrWhiteSpace(name))
+    {
+        Console.WriteLine("Ugyldig navn. Avbryter opprettelse.");
+        return;
+    }
+
+    var playListDb = new PlayListDb { Name = name };
+    var result = repo.InsertPlayList([playListDb]);
+    Console.WriteLine(result.Result ? "Ok!" : "Kunne ikke legge til spilleliste.");
+}
+
+static void SearchPlayLists(PlayListRepo repo)
+{
+    Console.WriteLine("\n== Søk etter spillelister ==");
+    Console.Write("Skriv inn navn på spillelisten: ");
+    var name = Console.ReadLine()?.Trim();
+    if (string.IsNullOrWhiteSpace(name))
+    {
+        Console.WriteLine("Ingen navn oppgitt.");
+        return;
+    }
+
+    var result = repo.GetPlayListByName(name);
+    if (!result.Result)
+    {
+        Console.WriteLine("Ingen resultater funnet eller feil under søk.");
+        return;
+    }
+
+    var playlists = result.ReturnValues?.OfType<PlayListDb>().ToArray();
+    if (playlists?.Length == 0)
+    {
+        Console.WriteLine("Ingen spillelister funnet.");
+        return;
+    }
+
+    Console.WriteLine($"Funnet {playlists?.Length} spilleliste(r):");
+    foreach (var pl in playlists!)
+        Console.WriteLine($"ID: {pl.Id}, Navn: {pl.Name}\n");
+}
+
+static void UpdatePlayList(PlayListRepo repo)
+{
+    Console.WriteLine("\n== Oppdater spilleliste ==");
+    Console.Write("Skriv inn ID på spillelisten som skal oppdateres: ");
+    if (!int.TryParse(Console.ReadLine(), out var id) || id <= 0)
+    {
+        Console.WriteLine("Ugyldig ID.");
+        return;
+    }
+
+    Console.Write("Nytt navn på spillelisten: ");
+    var name = Console.ReadLine()?.Trim();
+    if (string.IsNullOrWhiteSpace(name))
+    {
+        Console.WriteLine("Ugyldig navn. Avbryter oppdatering.");
+        return;
+    }
+
+    var playListDb = new PlayListDb { Id = id, Name = name };
+    var result = repo.UpdatePlayList([playListDb]);
+    Console.WriteLine(result.Result ? "Ok!" : "Kunne ikke oppdatere spilleliste.");
+}
+
+static void DeletePlayList(PlayListRepo repo)
+{
+    Console.WriteLine("\n== Slett spilleliste ==");
+    Console.Write("Skriv inn ID på spillelisten som skal slettes: ");
+    if (!int.TryParse(Console.ReadLine(), out var id) || id <= 0)
+    {
+        Console.WriteLine("Ugyldig ID.");
+        return;
+    }
+
+    var playListDb = new PlayListDb { Id = id };
+    var result = repo.DeletePlayList([playListDb]);
+    Console.WriteLine(result.Result ? "Ok!" : "Kunne ikke slette spilleliste.");
+}
+
+static void AddSongToPlayList(PlayListRepo playListRepo, MusicRepo musicRepo)
+{
+    Console.WriteLine("\n== Legg til sang i spilleliste ==");
+    Console.Write("Skriv inn ID på spillelisten: ");
+    if (!int.TryParse(Console.ReadLine(), out var playListId) || playListId <= 0)
+    {
+        Console.WriteLine("Ugyldig spilleliste-ID.");
+        return;
+    }
+
+    Console.Write("Skriv inn ID på sangen: ");
+    if (!int.TryParse(Console.ReadLine(), out var songId) || songId <= 0)
+    {
+        Console.WriteLine("Ugyldig sang-ID.");
+        return;
+    }
+
+    var playList = playListRepo.GetPlayListByName("PlayList1").ReturnValues?.OfType<PlayListDb>().FirstOrDefault();
+    if (playList == null)
+    {
+        Console.WriteLine("Spillelisten finnes ikke.");
+        return;
+    }
+
+    var song = musicRepo.GetSongById(songId).ReturnValues?.OfType<SongDb>().FirstOrDefault();
+    if (song == null)
+    {
+        Console.WriteLine("Sangen finnes ikke.");
+        return;
+    }
+
+    var canAdd = playListRepo.CanIAddThisSongToPlayList(song, new PlayListDb { Id = playListId }, musicRepo);
+    if (!canAdd.Result)
+    {
+        Console.WriteLine("Kan ikke legge til sangen i spillelisten (f.eks. finnes allerede eller sjangerkonflikt).");
+        return;
+    }
+
+    var connection = new SongsInPlayListDb { PlayListId = playListId, SongId = songId };
+    var result = playListRepo.InsertSongToPlayList([connection]);
+    Console.WriteLine(result.Result ? "Ok!" : "Kunne ikke legge til sang i spilleliste.");
+}
+
+static void RemoveSongFromPlayList(PlayListRepo repo)
+{
+    Console.WriteLine("\n== Fjern sang fra spilleliste ==");
+    Console.Write("Skriv inn ID på spillelisten: ");
+    if (!int.TryParse(Console.ReadLine(), out var playListId) || playListId <= 0)
+    {
+        Console.WriteLine("Ugyldig spilleliste-ID.");
+        return;
+    }
+
+    Console.Write("Skriv inn ID på sangen: ");
+    if (!int.TryParse(Console.ReadLine(), out var songId) || songId <= 0)
+    {
+        Console.WriteLine("Ugyldig sang-ID.");
+        return;
+    }
+
+    var connection = new SongsInPlayListDb { PlayListId = playListId, SongId = songId };
+    var result = repo.DeleteSongToPlayList([connection]);
+    Console.WriteLine(result.Result ? "Ok!" : "Kunne ikke fjerne sang fra spilleliste.");
+}
+
+static void ViewSongsInPlayList(PlayListRepo playListRepo, MusicRepo musicRepo)
+{
+    Console.WriteLine("\n== Vis sanger i spilleliste ==");
+    Console.Write("Skriv inn navn til spillelisten: ");
+    var userInpute = Console.ReadLine();
+    if (string.IsNullOrEmpty(userInpute))
+    {
+        Console.WriteLine("Ugyldig spilleliste-navn.");
+        return;
+    }
+
+    var playList = playListRepo.GetPlayListByName(userInpute).ReturnValues?.OfType<PlayListDb>().FirstOrDefault();
+    if (playList == null)
+    {
+        Console.WriteLine("Spillelisten finnes ikke.");
+        return;
+    }
+
+    var result = playListRepo.GetSongsFromPlayList(playList, musicRepo);
+    if (!result.Result)
+    {
+        Console.WriteLine("Ingen sanger funnet eller feil under henting.");
+        return;
+    }
+
+    var songs = result.ReturnValues?.OfType<SongDb>().ToArray();
+    if (songs?.Length == 0)
+    {
+        Console.WriteLine("Ingen sanger i spillelisten.");
+        return;
+    }
+
+    Console.WriteLine($"Funnet {songs?.Length} sang(er) i spillelisten:");
+    foreach (var s in songs!)
+        Console.WriteLine(s + "\n");
 }
 
 static Song? ReadSongDetails()
@@ -209,7 +415,7 @@ static Song? ReadSongDetails()
         song.Genres = Console.ReadLine()?
             .Split(' ', StringSplitOptions.RemoveEmptyEntries)
             .Select(g => g.Trim())
-            .ToArray()??[];
+            .ToArray() ?? [];
         if (song.Genres.Length == 0) throw new ArgumentException("Genre is required");
         Console.Write("Beskrivelse: ");
         song.Description = Console.ReadLine()?.Trim() ?? string.Empty;

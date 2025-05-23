@@ -111,6 +111,25 @@ public class MusicRepo
 
     }
 
+    public Results GetSongById(int id)
+    {
+        var result = new Results("Get song by id", [id]);
+        if (!IsGetReady() || !IsDbHaveData())
+        {
+            result.AddMessage("IsGetReady() or IsDbHaveData() returns false");
+            result.SetResult(false);
+            result.SetReturnValue([false]);
+            return result;
+        } //Secure check
+        const string sql = "SELECT * FROM Music WHERE Id = @id";
+        var parameters = new SqliteParameter("@id", id);
+        var mapperresult = MapObjectToSongDb(Db.RunSqlReader(sql, [parameters]));
+        result.SetChildrenResult(mapperresult);
+        result.SetReturnValue([mapperresult.ReturnValues?.FirstOrDefault()??new object()]);
+        result.SetResult(mapperresult.Result);
+        return result;
+    }
+
     public Results InsertSongs(IEnumerable<SongDb> songs)
     {
         var callParam = songs as SongDb[] ?? songs.ToArray(); // Get an array to go thou
