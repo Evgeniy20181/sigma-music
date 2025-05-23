@@ -288,7 +288,7 @@ public class PlayListRepo
     {
         var callParam = list as PlayListDb[] ?? list.ToArray(); // Get an array to go thou
         var result = new Results("DeletePlayList", callParam);
-        const string sql = "DELETE\nFROM PlayList\nWHERE Id = @id;";
+        const string sql = "PRAGMA foreign_keys = OFF; DELETE\nFROM PlayList\nWHERE Id = @id; PRAGMA foreign_keys = ON;";
         // Save sql result to nextResult
         result.SetChildrenResult(RepoCud(callParam, sql));
         result.AddMessage(sql);

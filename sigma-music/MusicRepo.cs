@@ -164,7 +164,7 @@ public class MusicRepo
     {
         var callParam = songs as SongDb[] ?? songs.ToArray(); // Get an array to go thou
         var result = new Results("DeleteSongs", callParam);
-        const string sql = "DELETE \n FROM Music \n WHERE Id = @id;";
+        const string sql = "PRAGMA foreign_keys = OFF; DELETE \n FROM Music \n WHERE Id = @id; PRAGMA foreign_keys = ON;";
         // Save sql result to nextResult
         result.SetChildrenResult(RepoCud(callParam, sql));
         result.AddMessage(sql);

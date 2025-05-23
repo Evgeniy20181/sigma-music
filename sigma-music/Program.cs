@@ -105,26 +105,35 @@ while (true)
     Console.Write("Velg et alternativ (1-12): ");
     var choice = Console.ReadLine()?.Trim();
 
-    switch (choice)
+    try
     {
-        case "1": CreateSong(musicRepo); break;
-        case "2": SearchSongs(musicRepo); break;
-        case "3": UpdateSong(musicRepo); break;
-        case "4": DeleteSong(musicRepo); break;
-        case "5": CreatePlayList(playListRepo); break;
-        case "6": SearchPlayLists(playListRepo); break;
-        case "7": UpdatePlayList(playListRepo); break;
-        case "8": DeletePlayList(playListRepo); break;
-        case "9": AddSongToPlayList(playListRepo, musicRepo); break;
-        case "10": RemoveSongFromPlayList(playListRepo); break;
-        case "11": ViewSongsInPlayList(playListRepo, musicRepo); break;
-        case "12":
-            Console.WriteLine("Avslutter programmet. Ha en fin dag!");
-            Db.Close();
-            Console.ReadLine();
-            return;
-        default: Console.WriteLine("Ugyldig valg, prøv igjen."); break;
+        switch (choice)
+        {
+            case "1": CreateSong(musicRepo); break;
+            case "2": SearchSongs(musicRepo); break;
+            case "3": UpdateSong(musicRepo); break;
+            case "4": DeleteSong(musicRepo); break;
+            case "5": CreatePlayList(playListRepo); break;
+            case "6": SearchPlayLists(playListRepo); break;
+            case "7": UpdatePlayList(playListRepo); break;
+            case "8": DeletePlayList(playListRepo); break;
+            case "9": AddSongToPlayList(playListRepo, musicRepo); break;
+            case "10": RemoveSongFromPlayList(playListRepo); break;
+            case "11": ViewSongsInPlayList(playListRepo, musicRepo); break;
+            case "12":
+                Console.WriteLine("Avslutter programmet. Ha en fin dag!");
+                Db.Close();
+                Console.ReadLine();
+                return;
+            default: Console.WriteLine("Ugyldig valg, prøv igjen."); break;
+        }
     }
+    catch (Exception e)
+    {
+        Console.WriteLine(e.Message);
+        Console.WriteLine("Noe gikk galt prøv på nytt!");
+    }
+    
 }
 
 static void CreateSong(MusicRepo repo)
@@ -302,9 +311,9 @@ static void AddSongToPlayList(PlayListRepo playListRepo, MusicRepo musicRepo)
 {
     Console.WriteLine("\n== Legg til sang i spilleliste ==");
     Console.Write("Skriv inn ID på spillelisten: ");
-    if (!int.TryParse(Console.ReadLine(), out var playListId) || playListId <= 0)
+    var userInpute = Console.ReadLine();
+    if (string.IsNullOrEmpty(userInpute))
     {
-        Console.WriteLine("Ugyldig spilleliste-ID.");
         return;
     }
 
@@ -315,7 +324,7 @@ static void AddSongToPlayList(PlayListRepo playListRepo, MusicRepo musicRepo)
         return;
     }
 
-    var playList = playListRepo.GetPlayListByName("PlayList1").ReturnValues?.OfType<PlayListDb>().FirstOrDefault();
+    var playList = playListRepo.GetPlayListByName(userInpute).ReturnValues?.OfType<PlayListDb>().FirstOrDefault();
     if (playList == null)
     {
         Console.WriteLine("Spillelisten finnes ikke.");
@@ -329,14 +338,14 @@ static void AddSongToPlayList(PlayListRepo playListRepo, MusicRepo musicRepo)
         return;
     }
 
-    var canAdd = playListRepo.CanIAddThisSongToPlayList(song, new PlayListDb { Id = playListId }, musicRepo);
+    var canAdd = playListRepo.CanIAddThisSongToPlayList(song, new PlayListDb { Id = playList.Id, Name = playList.Name}, musicRepo);
     if (!canAdd.Result)
     {
         Console.WriteLine("Kan ikke legge til sangen i spillelisten (f.eks. finnes allerede eller sjangerkonflikt).");
         return;
     }
 
-    var connection = new SongsInPlayListDb { PlayListId = playListId, SongId = songId };
+    var connection = new SongsInPlayListDb { PlayListId = playList.Id, SongId = song.Id };
     var result = playListRepo.InsertSongToPlayList([connection]);
     Console.WriteLine(result.Result ? "Ok!" : "Kunne ikke legge til sang i spilleliste.");
 }
