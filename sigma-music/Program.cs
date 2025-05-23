@@ -310,7 +310,7 @@ static void DeletePlayList(PlayListRepo repo)
 static void AddSongToPlayList(PlayListRepo playListRepo, MusicRepo musicRepo)
 {
     Console.WriteLine("\n== Legg til sang i spilleliste ==");
-    Console.Write("Skriv inn ID på spillelisten: ");
+    Console.Write("Skriv inn navn på spillelisten: ");
     var userInpute = Console.ReadLine();
     if (string.IsNullOrEmpty(userInpute))
     {
